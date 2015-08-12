@@ -1,30 +1,39 @@
-function matrix2TikZ(matrix, filename, width)
+function matrix2TikZ(matrix, filename, width, list)
 %MATRIX2TIKZ    Convert matrix to TikZ/Pgfplots figure.
 %
 %   MATRIX2TIKZ(MATRIX, FILENAME,...)
 %   convert the 2d MATRIX to LaTeX figure saved in FILENAME.
+%   MATRIX is a [n x m] or [m x 3] matrix.
 %
 %   MATRIX2TIKZ(MATRIX, FILENAME, WIDTH) explicitely specifies the width of the
 %   figure. (default: 8cm)
+%
+%   MATRIX2TIKZ(MATRIX, FILENAME, WIDTH, list) if list == 'list' the MATRIX is
+%   already a [m x 3] matrix and is directly written to file.
 
 %Input checks
-if nargin < 2
-	error('You must provide at least two arguments: a MATRIX and a FILENAME.');
-elseif nargin < 3
-	width = '8cm';
-end
-
 if ndims(matrix) ~= 2
 	error('I can only convert a 2D matrix.');
 end
 
+if nargin < 2
+	error('You must provide at least two arguments: a MATRIX and a FILENAME.');
+elseif nargin < 3
+	width = '8cm';
+	list = '';	
+end
+
 %Generate output matrix [x y data]
-out = zeros(size(matrix,1)*size(matrix,2),3);
-for x=1:size(matrix, 2)
-	for y=1:size(matrix, 1)
-		%Y axis is inverted
-       out((y-1)*size(matrix, 2)+x,:) = [x size(matrix,1)+1-y matrix(y,x)];
-    end
+if strcmp(list, 'list')
+	out = matrix;
+else
+	out = zeros(size(matrix,1)*size(matrix,2),3);
+	for x=1:size(matrix, 2)
+		for y=1:size(matrix, 1)
+			%Y axis is inverted
+			out((y-1)*size(matrix, 2)+x,:) = [x size(matrix,1)+1-y matrix(y,x)];
+		end
+	end
 end
 
 %Write to file
